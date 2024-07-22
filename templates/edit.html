@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block title %}Edit User{% endblock %} {% block
+content %}
+
+<h1>Edit a user</h1>
+<form action="/user/{{user.id}}/edit" method="POST" class="row g-3 mt-2">
+  <label class="form-label" for="first-name"
+    >First Name
+    <input
+      class="form-control"
+      type="text"
+      name="first-name"
+      id="first-name"
+      placeholder="{{user.first_name}}"
+    />
+  </label>
+
+  <label class="form-label" for="last-name"
+    >Last Name
+    <input
+      class="form-control"
+      type="text"
+      name="last-name"
+      id="last-name"
+      placeholder="{{user.last_name}}"
+    />
+  </label>
+
+  <label class="form-label" for="imgae-url"
+    >Image URL
+    <input
+      class="form-control"
+      type="text"
+      name="imgae-url"
+      id="imgae-url"
+      placeholder="{{user.image_url}}"
+    />
+  </label>
+
+  <div class="d-flex flex-row-reverse">
+    <a href="/users" class="btn btn-outline-info ms-2">Cancel</a>
+    <button class="btn btn-success">Save</button>
+  </div>
+</form>
+{% endblock %}

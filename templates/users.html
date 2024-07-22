@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block title %}My awesome page title{% endblock %}
+{% block content %}
+
+<h1>Users</h1>
+<ul class="list-group">
+  {% for user in users%}
+  <li class="list-group-item">
+    <a href="/users/{{user.id}}">{{user.full_name}}</a>
+  </li>
+  {% endfor%}
+</ul>
+<form action="/users/new">
+  <button class="btn btn-secondary mt-2">Add user</button>
+</form>
+
+{% endblock %}
