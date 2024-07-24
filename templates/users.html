@@ -2,12 +2,15 @@
 {% block content %}
 
 <h1>Users</h1>
+{% for msg in get_flashed_messages() %}
+<p>{{msg}}</p>
+{% endfor %}
 <ul class="list-group">
   {% for user in users%}
   <li class="list-group-item">
     <a href="/users/{{user.id}}">{{user.full_name}}</a>
   </li>
-  {% endfor%}
+  {% endfor %}
 </ul>
 <form action="/users/new">
   <button class="btn btn-secondary mt-2">Add user</button>
