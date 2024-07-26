@@ -2,7 +2,7 @@
 
 from flask import Flask, request, render_template, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 
 app = Flask(__name__)
 
@@ -139,7 +139,8 @@ def show_post(post_id):
 @app.route("/posts/<int:post_id>/edit")
 def edit_post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template("edit-post.html", post=post)
+    tags = Tag.query.all()
+    return render_template("edit-post.html", post=post, tags=tags)
 
 
 # Handle editing of a post. Redirect back to the post view.
@@ -149,6 +150,12 @@ def handle_editing_post(post_id):
 
     title = request.form["title"]
     content = request.form["content"]
+    # Returns a list of selected_value [on, on]
+    tag_ids = request.form.getlist("tags")
+
+    for id in tag_ids:
+        tag = Tag.query.get_or_404(id)
+        post.tags.append(tag)
 
     post.title = title
     post.content = content
@@ -167,3 +174,81 @@ def delete_post(post_id):
 
     flash(f"Post '{post.title}' has been deleted.")
     return redirect(f"/users/{post.user_id}")
+
+
+# TAGS ##################################################################
+
+
+# Lists all tags, with links to the tag detail page.
+@app.route("/tags")
+def list_tags():
+    tags = Tag.query.all()
+
+    return render_template("tags/list-tags.html", tags=tags)
+
+
+# GET /tags/[tag-id] : Show detail about a tag. Have links to edit form and to delete.
+@app.route("/tags/<int:tag_id>")
+def show_tag_detail(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+
+    return render_template("tags/tag-details.html", tag=tag)
+
+
+# GET /tags/new : Shows a form to add a new tag.
+@app.route("/tags/new")
+def add_tags():
+    posts = Post.query.all()
+
+    return render_template("tags/add-tag.html", posts=posts)
+
+
+# Process add form, adds tag, and redirect to tag list.
+@app.route("/tags/new", methods=["POST"])
+def handle_add_tags():
+    new_tag = Tag(name=request.form["tag"])
+    db.session.add(new_tag)
+
+    post_ids = request.form.getlist("posts")
+
+    for id in post_ids:
+        post = Post.query.get_or_404(id)
+        new_tag.posts.append(post)
+
+    db.session.commit()
+
+    return redirect("/tags")
+
+
+# GET /tags/[tag-id]/edit : Show edit form for a tag.
+@app.route("/tags/<int:tag_id>/edit")
+def show_edit_form(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    posts = Post.query.all()
+    return render_template("tags/edit-tag.html", tag=tag, posts=posts)
+
+
+# POST /tags/[tag-id]/edit : Process edit form, edit tag, and redirects to the tags list.
+@app.route("/tags/<int:tag_id>/edit", methods=["POST"])
+def handle_edit_form(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    tag.name = request.form["tag"]
+
+    post_ids = request.form.getlist("posts")
+
+    for id in post_ids:
+        post = Post.query.get_or_404(id)
+        tag.posts.append(post)
+
+    db.session.commit()
+
+    return redirect("/tags")
+
+
+# POST /tags/[tag-id]/delete : Delete a tag.
+@app.route("/tags/<int:tag_id>/delete", methods=["POST"])
+def delete_tag(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    db.session.delete(tag)
+    db.session.commit()
+    return redirect("/tags")

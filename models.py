@@ -38,6 +38,26 @@ class Post(db.Model):
     # Setting up a foreign key constraint
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
+    tags = db.relationship("Tag", secondary="posts_tags", backref="posts")
+
     @property
     def formatted_date(self):
         return self.created_at.strftime("%a %b %d %Y, %I:%M %p")
+
+
+class Tag(db.Model):
+
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.Text, nullable=False, unique=True)
+
+
+class PostTag(db.Model):
+
+    __tablename__ = "posts_tags"
+
+    # We do not want the same post to be tagged to the same tag more than once,
+    # want the combination of post + tag to be unique (?)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), primary_key=True)

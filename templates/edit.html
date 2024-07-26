@@ -2,7 +2,7 @@
 content %}
 
 <h1>Edit a user</h1>
-<form action="/user/{{user.id}}/edit" method="POST" class="row g-3 mt-2">
+<form action="/user/{{user.id}}/edit" method="POST" class="g-3 mt-2">
   <label class="form-label" for="first-name"
     >First Name
     <input
@@ -37,7 +37,7 @@ content %}
   </label>
 
   <div class="d-flex flex-row-reverse">
-    <a href="/users" class="btn btn-outline-info ms-2">Cancel</a>
+    <a href="/users" class="btn btn-outline-info ml-2">Cancel</a>
     <button class="btn btn-success">Save</button>
   </div>
 </form>
